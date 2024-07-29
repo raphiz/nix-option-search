@@ -33,9 +33,9 @@ elif [ "$1" == "preview" ]; then
       NAME=$1
 
       RAW=$(jq ".\"$1\"" < "${OPTIONS_JSON}")
-      TYPE=$(echo "$RAW" | jq .type)
-      DESCRIPTION=$(echo "$RAW" | jq .description)
-      DEFAULT=$(echo "$RAW" | jq .default.text)
+      TYPE=$(echo "$RAW" | jq -r .type)
+      DESCRIPTION=$(echo "$RAW" | jq -r .description)
+      DEFAULT=$(echo "$RAW" | jq -r .default.text)
 
       echo "NAME   : $NAME"
       echo "DEFAULT: $DEFAULT"
