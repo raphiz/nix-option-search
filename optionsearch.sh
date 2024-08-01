@@ -2,10 +2,24 @@
 
 OPTIONSEARCH=$0
 
+SEARCH=${SEARCH:-keys}
+if [ "$SEARCH" == 'keys' ]; then
+      function formatOptions() {
+            JQ_COMMAND="keys[]"
+            jq -r "$JQ_COMMAND" < "${OPTIONS_JSON}"
+      }
+else
+      function formatOptions() {
+            JQ_COMMAND='to_entries|map({key: .key, value: .value.description | gsub("\\n"; "")}) | map(.key + "\t" + .value) | .[]'
+            jq -r "$JQ_COMMAND" < "${OPTIONS_JSON}" | sed -e 's/$/\t/'
+      }
+fi
+
 # the fzf search wrapper
 function search() {
-      jq -r "keys[]" < "${OPTIONS_JSON}" \
-            | fzf \
+      formatOptions \
+            | tr '\n\t' '\0\n' \
+            | fzf --read0 --exact \
             --reverse \
             --no-sort \
             --prompt="Nix Module Options> " \
@@ -30,9 +44,9 @@ if [ $# == 0 ]; then
 
 elif [ "$1" == "preview" ]; then
       shift 1;
-      NAME=$1
+      NAME=$(echo "$1" | sed -e '1q' | sed -e 's/\t.*//')
 
-      RAW=$(jq ".\"$1\"" < "${OPTIONS_JSON}")
+      RAW=$(jq ".\"$NAME\"" < "${OPTIONS_JSON}")
       TYPE=$(echo "$RAW" | jq -r .type)
       DESCRIPTION=$(echo "$RAW" | jq -r .description)
       DEFAULT=$(echo "$RAW" | jq -r .default.text)
