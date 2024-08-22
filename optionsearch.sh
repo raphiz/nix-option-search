@@ -91,6 +91,9 @@ elif [ "$1" == "nixos" ]; then
       JSON_DRV=$(nix-build '<nixpkgs/nixos/release.nix>' -A options --no-out-link)
       OPTIONS_JSON=$JSON_DRV/share/doc/nixos/options.json $OPTIONSEARCH
 elif [ "$1" == "devenv" ]; then
-      JSON_DRV=$(yes "N" | nix build --no-link --print-out-paths github:cachix/devenv\#devenv-docs-options-json)
+      JSON_DRV=$(yes "N" | nix build --no-link --print-out-paths github:cachix/devenv/v1.0.8\#devenv-docs-options-json)
       OPTIONS_JSON=$JSON_DRV/share/doc/nixos/options.json $OPTIONSEARCH
+elif [ "$1" == "k" ] || [ "$1" == "kubenix" ]; then
+      JSON_DRV=$(nix build github:hall/kubenix\#docs --no-link --print-out-paths)
+      OPTIONS_JSON=$JSON_DRV $OPTIONSEARCH
 fi;
