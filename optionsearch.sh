@@ -43,10 +43,12 @@ if [ $# == 0 ]; then
       QUERY="" search
 
 elif [ "$1" == "preview" ]; then
+      # set -x # debugging
       shift 1;
-      NAME=$(echo "$1" | sed -e '1q' | sed -e 's/\t.*//')
+      NAME=$(echo "$1" | sed -e '1q' | sed -e 's/\t.*//') # key only (no detail line)
+      NAME_ESCAPED=$(echo "$NAME" | sed -e 's?"?\\"?g') # double-quote needs quoting in jq
 
-      RAW=$(jq ".\"$NAME\"" < "${OPTIONS_JSON}")
+      RAW=$(jq ".\"$NAME_ESCAPED\"" < "${OPTIONS_JSON}")
       TYPE=$(echo "$RAW" | jq -r .type)
       DESCRIPTION=$(echo "$RAW" | jq -r .description)
       DEFAULT=$(echo "$RAW" | jq -r .default.text)
