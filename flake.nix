@@ -13,10 +13,10 @@
     packages = forAllSystems (pkgs: {
       optionsearch = pkgs.callPackage ./optionsearch.nix {};
     });
-    #    devShells = forAllSystems (pkgs: {
-    #      default =
-    #        pkgs.mkShellNoCC {
-    #        };
-    #    });
+    devShells = forAllSystems (pkgs: {
+      default =
+        pkgs.mkShellNoCC {
+        };
+    });
   };
 }
