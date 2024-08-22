@@ -35,8 +35,12 @@ if [ $# == 0 ]; then
 
       if [ "${OPTIONS_JSON:-}" == "" ]; then
             echo "Missing OPTIONS_JSON. Define one or select source"
-            echo "  for home-manager: $OPTIONSEARCH hm"
             echo "  for nixos:        $OPTIONSEARCH nixos"
+            echo "  for devenv:       $OPTIONSEARCH devenv"
+            echo "  for kubenix:      $OPTIONSEARCH k    (or kubenix)"
+            echo "  for home-manager: $OPTIONSEARCH hm   (or home-manager)"
+            echo ""
+            echo "keybindings in search: ctrl-g: refine to given selection"
             exit 1
       fi
 
