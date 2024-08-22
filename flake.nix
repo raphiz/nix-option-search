@@ -1,5 +1,5 @@
 {
-  description = "Utilities to search nix module options";
+  description = "Nix Module Option Search";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs";
@@ -13,10 +13,10 @@
     packages = forAllSystems (pkgs: {
       optionsearch = pkgs.callPackage ./optionsearch.nix {};
     });
-    devShells = forAllSystems (pkgs: {
-      default =
-        pkgs.mkShellNoCC {
-        };
-    });
+    #    devShells = forAllSystems (pkgs: {
+    #      default =
+    #        pkgs.mkShellNoCC {
+    #        };
+    #    });
   };
 }
