@@ -1,16 +1,19 @@
 #!/usr/bin/env bash
+# set -x #debugging
 
 OPTIONSEARCH=$0
 
 SEARCH=${SEARCH:-keys}
 if [ "$SEARCH" == 'keys' ]; then
+      ## index only by "option-key"
       function formatOptions() {
             JQ_COMMAND="keys[]"
             jq -r "$JQ_COMMAND" < "${OPTIONS_JSON}"
       }
 else
+      ## index only by "option-key & description" (two-line display)
       function formatOptions() {
-            JQ_COMMAND='to_entries|map({key: .key, value: .value.description | gsub("\\n"; "")}) | map(.key + "\t" + .value) | .[]'
+            JQ_COMMAND='to_entries|map({key: .key, value: (.value.description // empty) | gsub("\\n"; "")}) | map(.key + "\t" + .value) | .[]'
             jq -r "$JQ_COMMAND" < "${OPTIONS_JSON}" | sed -e 's/$/\t/'
       }
 fi
@@ -24,7 +27,7 @@ function search() {
             --no-sort \
             --prompt="Nix Module Options> " \
             --preview="bash $OPTIONSEARCH preview {}" \
-            --preview-window=wrap \
+            --preview-window=wrap,up \
             --bind="ctrl-g:become(bash $OPTIONSEARCH refine {} {q} )" \
             --query "$QUERY"
 }
@@ -34,13 +37,14 @@ function search() {
 if [ $# == 0 ]; then
 
       if [ "${OPTIONS_JSON:-}" == "" ]; then
-            echo "Missing OPTIONS_JSON. Define one or select source"
+            echo "Missing OPTIONS_JSON. Define path via env var or select source:"
             echo "  for nixos:        $OPTIONSEARCH nixos"
             echo "  for devenv:       $OPTIONSEARCH devenv"
             echo "  for kubenix:      $OPTIONSEARCH k    (or kubenix)"
             echo "  for home-manager: $OPTIONSEARCH hm   (or home-manager)"
             echo ""
             echo "keybindings in search: ctrl-g: refine to given selection"
+            echo "EnvVar: SEARCH=keys or description: index key only or including description"
             exit 1
       fi
 
