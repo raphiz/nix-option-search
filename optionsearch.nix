@@ -9,5 +9,5 @@
 writeShellApplication {
   name = "optionsearch";
   runtimeInputs = [jq fzf nix gnused coreutils];
-  text = ''${./optionsearch.sh} "''${@}"'';
+  text = builtins.readFile ./optionsearch.sh;
 }

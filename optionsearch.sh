@@ -46,6 +46,7 @@ elif [ "$1" == "preview" ]; then
       # set -x # debugging
       shift 1;
       NAME=$(echo "$1" | sed -e '1q' | sed -e 's/\t.*//') # key only (no detail line)
+      # shellcheck disable=SC2001
       NAME_ESCAPED=$(echo "$NAME" | sed -e 's?"?\\"?g') # double-quote needs quoting in jq
 
       RAW=$(jq ".\"$NAME_ESCAPED\"" < "${OPTIONS_JSON}")
