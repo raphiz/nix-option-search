@@ -10,8 +10,9 @@
       nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed
       (system: function nixpkgs.legacyPackages.${system});
   in {
-    packages = forAllSystems (pkgs: {
+    packages = forAllSystems (pkgs: rec {
       optionsearch = pkgs.callPackage ./optionsearch.nix {};
+      default = optionsearch;
     });
     devShells = forAllSystems (pkgs: {
       default =
