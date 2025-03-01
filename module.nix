@@ -5,7 +5,7 @@
   config,
   ...
 }: let
-  cfg = config.docs;
+  cfg = config.docs.option-search;
   search = pkgs.callPackage ./optionsearch.nix {};
   jsonPath = "/share/doc/nixos/options.json";
   # https://github.com/NixOS/nixpkgs/blob/nixos-24.11/nixos/lib/make-options-doc/default.nix
@@ -14,8 +14,8 @@
     warningsAreErrors = false;
   };
 in {
-  options.docs = {
-    options-json = lib.options.mkOption {
+  options.docs.option-search = {
+    json = lib.options.mkOption {
       type = lib.types.package;
       default = optionsDoc.optionsJSON;
       description = ''
@@ -26,23 +26,23 @@ in {
         For details see: https://github.com/NixOS/nixpkgs/blob/nixos-24.11/nixos/lib/make-options-doc/default.nix
       '';
     };
-    option-search-name = lib.options.mkOption {
+    name = lib.options.mkOption {
       type = lib.types.str;
       default = "docs";
       description = "The name of the option-search wrapper command";
     };
-    option-search = lib.options.mkOption {
+    package = lib.options.mkOption {
       type = lib.types.package;
       description = "devshell option search";
       default = pkgs.writeShellApplication {
-        name = cfg.option-search-name;
+        name = cfg.name;
         runtimeInputs = [search];
-        text = "OPTIONS_JSON=${cfg.options-json}/${jsonPath} optionsearch";
+        text = "OPTIONS_JSON=${cfg.json}/${jsonPath} optionsearch";
       };
     };
     add-to-packages = lib.mkEnableOption "Add to Packages" // {default = true;};
   };
   config = lib.optionalAttrs (options ? packages) {
-    packages = lib.mkIf cfg.add-to-packages [cfg.option-search];
+    packages = lib.mkIf cfg.add-to-packages [cfg.package];
   };
 }
