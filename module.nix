@@ -13,20 +13,21 @@
     inherit options;
     warningsAreErrors = false;
     # make it work for home-manager too
-    transformOptions = option:
-      {
-        inherit
-          (option)
-          name
-          description
-          type
-          declarations
-          loc
-          visible
-          internal
-          ;
+    transformOptions = option: let
+      handleUnsupported = x: let
+        tried = builtins.tryEval x;
+      in
+        if tried.success
+        then tried.value
+        else {text = "<error> typically unsupported system derivation";};
+    in
+      option
+      // lib.optionalAttrs (option ? default) {
+        default = handleUnsupported option.default;
       }
-      // lib.optionalAttrs (option ? default) {inherit (option) default;};
+      // lib.optionalAttrs (option ? example) {
+        example = handleUnsupported option.example;
+      };
   };
 in {
   options.docs.option-search = {
@@ -45,6 +46,7 @@ in {
       type = lib.types.str;
       default = "docs";
       description = "The name of the option-search wrapper command";
+      example = "docs";
     };
     package = lib.options.mkOption {
       type = lib.types.package;

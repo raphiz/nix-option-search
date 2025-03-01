@@ -75,8 +75,9 @@ elif [ "$1" == "preview" ]; then
       RAW=$(raw_entry)
       TYPE=$(echo "$RAW" | jq -r .type)
       DESCRIPTION=$(echo "$RAW" | jq -r .description)
-      DEFAULT=$(echo "$RAW" | jq -r .default.text)
+      DEFAULT=$(echo "$RAW" | jq -r '.default.text // empty')
       DECLARATION=$(echo "$RAW" | jq -r '.declarations[]')
+      EXAMPLE=$(echo "$RAW" | jq -r '.example.text // empty')
 
       echo "NAME   : $NAME"
       echo "DEFAULT: $DEFAULT"
@@ -87,6 +88,11 @@ elif [ "$1" == "preview" ]; then
       echo ""
       echo "$DESCRIPTION"
       echo ""
+      if [ -n "$EXAMPLE" ]; then
+      echo "--------------------------------------------------------------"
+      echo "EXAMPLE:"
+      echo "$EXAMPLE"
+      fi
       if false; then
             echo "--------------------------------------------------------------"
             echo "RAW:"
