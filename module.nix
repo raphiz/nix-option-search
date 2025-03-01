@@ -40,9 +40,9 @@ in {
         text = "OPTIONS_JSON=${cfg.options-json}/${jsonPath} optionsearch";
       };
     };
-    add-to-packages = lib.mkEnableOption "Add to Packages" // {default = options ? packages;};
+    add-to-packages = lib.mkEnableOption "Add to Packages" // {default = true;};
   };
-  config = lib.mkIf cfg.add-to-packages {
-    packages = [cfg.option-search];
+  config = lib.optionalAttrs (options ? packages) {
+    packages = lib.mkIf cfg.add-to-packages [cfg.option-search];
   };
 }
