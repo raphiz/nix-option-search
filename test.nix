@@ -14,6 +14,10 @@
       type = lib.types.listOf lib.types.package;
       default = [];
     };
+    home.packages = lib.options.mkOption {
+      type = lib.types.listOf lib.types.package;
+      default = [];
+    };
   };
   config = {
     devsh = pkgs.mkShellNoCC {

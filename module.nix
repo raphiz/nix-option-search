@@ -42,7 +42,11 @@ in {
     };
     add-to-packages = lib.mkEnableOption "Add to Packages" // {default = true;};
   };
-  config = lib.optionalAttrs (options ? packages) {
-    packages = lib.mkIf cfg.add-to-packages [cfg.package];
-  };
+  config =
+    lib.optionalAttrs (options ? packages) {
+      packages = lib.mkIf cfg.add-to-packages [cfg.package];
+    }
+    // lib.optionalAttrs (options ? home.packages) {
+      home.packages = lib.mkIf cfg.add-to-packages [cfg.package];
+    };
 }
