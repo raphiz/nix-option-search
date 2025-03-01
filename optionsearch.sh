@@ -29,7 +29,18 @@ function search() {
             --preview="bash $OPTIONSEARCH preview {}" \
             --preview-window=wrap,up \
             --bind="ctrl-g:become(bash $OPTIONSEARCH refine {} {q} )" \
+            --bind="ctrl-v:become(bash $OPTIONSEARCH source {} {q} )" \
             --query "$QUERY"
+}
+
+function extract_name() {
+      echo "$1" | sed -e '1q' | sed -e 's/\t.*//' # key only (no detail line)
+}
+
+function raw_entry() {
+      # shellcheck disable=SC2001
+      NAME_ESCAPED=$(echo "$NAME" | sed -e 's?"?\\"?g') # double-quote needs quoting in jq
+      jq ".\"$NAME_ESCAPED\"" < "${OPTIONS_JSON}"
 }
 
 
@@ -49,30 +60,38 @@ if [ $# == 0 ]; then
       fi
 
       QUERY="" search
+elif [ "$1" == "source" ]; then
+      shift 1;
+      NAME=$(extract_name "$1")
+      RAW=$(raw_entry)
+      DECLARATION=$(echo "$RAW" | jq -r '.declarations[]')
+      exec vim "$DECLARATION"
 
 elif [ "$1" == "preview" ]; then
       # set -x # debugging
       shift 1;
-      NAME=$(echo "$1" | sed -e '1q' | sed -e 's/\t.*//') # key only (no detail line)
-      # shellcheck disable=SC2001
-      NAME_ESCAPED=$(echo "$NAME" | sed -e 's?"?\\"?g') # double-quote needs quoting in jq
-
-      RAW=$(jq ".\"$NAME_ESCAPED\"" < "${OPTIONS_JSON}")
+      NAME=$(extract_name "$1")
+      RAW=$(raw_entry)
       TYPE=$(echo "$RAW" | jq -r .type)
       DESCRIPTION=$(echo "$RAW" | jq -r .description)
       DEFAULT=$(echo "$RAW" | jq -r .default.text)
+      DECLARATION=$(echo "$RAW" | jq -r '.declarations[]')
 
       echo "NAME   : $NAME"
       echo "DEFAULT: $DEFAULT"
       echo "TYPE   : $TYPE"
+      echo "DECLARATION   : $DECLARATION"
       echo "--------------------------------------------------------------"
       echo "DESCRIPTION:"
       echo ""
       echo "$DESCRIPTION"
-      echo "--------------------------------------------------------------"
-      echo "RAW:"
       echo ""
-      echo "$RAW"
+      if false; then
+            echo "--------------------------------------------------------------"
+            echo "RAW:"
+            echo ""
+            echo "$RAW"
+      fi
 
 elif [ "$1" == "refine" ]; then
       shift 1;
