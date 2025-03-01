@@ -25,7 +25,8 @@ function search() {
             | fzf --read0 --exact \
             --reverse \
             --no-sort \
-            --prompt="Nix Module Options> " \
+            --prompt="Nix Module Options (Press ? for help)> " \
+            --bind '?:preview:echo -e "ctrl-v view source file\nctrl-g go to parent path of current option"' \
             --preview="bash $OPTIONSEARCH preview {}" \
             --preview-window=wrap,up \
             --bind="ctrl-g:become(bash $OPTIONSEARCH refine {} {q} )" \
