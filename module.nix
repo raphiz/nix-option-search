@@ -12,6 +12,21 @@
   optionsDoc = pkgs.nixosOptionsDoc {
     inherit options;
     warningsAreErrors = false;
+    # make it work for home-manager too
+    transformOptions = option:
+      {
+        inherit
+          (option)
+          name
+          description
+          type
+          declarations
+          loc
+          visible
+          internal
+          ;
+      }
+      // lib.optionalAttrs (option ? default) {inherit (option) default;};
   };
 in {
   options.docs.option-search = {
