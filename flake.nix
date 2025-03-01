@@ -14,7 +14,7 @@
       nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed
       (system: function nixpkgs.legacyPackages.${system});
   in {
-    nixosModules.optionsearch = ./module.nix;
+    nixosModules.default = ./module.nix;
     packages = forAllSystems (pkgs: rec {
       optionsearch = pkgs.callPackage ./optionsearch.nix {};
       default = optionsearch;
@@ -22,7 +22,7 @@
     devShells = forAllSystems (pkgs: {
       default =
         (nixpkgs.lib.modules.evalModules {
-          modules = [self.nixosModules.optionsearch ./test.nix];
+          modules = [self.nixosModules.default ./test.nix];
           specialArgs = {inherit pkgs;};
         })
         .config
@@ -30,7 +30,7 @@
     });
     #debug = forAllSystems (pkgs: {
     #  default = nixpkgs.lib.modules.evalModules {
-    #    modules = [self.nixosModules.optionsearch ./test.nix];
+    #    modules = [self.nixosModules.default ./test.nix];
     #    specialArgs = {inherit pkgs;};
     #  };
     #});
