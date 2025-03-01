@@ -44,7 +44,7 @@ in {
     };
     name = lib.options.mkOption {
       type = lib.types.str;
-      default = "docs";
+      default = "nix-option-search";
       description = "The name of the option-search wrapper command";
       example = "docs";
     };

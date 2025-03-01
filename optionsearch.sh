@@ -26,10 +26,10 @@ function search() {
             --reverse \
             --no-sort \
             --prompt="Nix Module Options (Press ? for help)> " \
-            --bind '?:preview:echo -e "ctrl-v view source file\nctrl-g go to parent path of current option"' \
+            --bind '?:preview:echo -e "ctrl-v view source file\nctrl-u go to parent path of current option"' \
             --preview="bash $OPTIONSEARCH preview {}" \
             --preview-window=wrap,up \
-            --bind="ctrl-g:become(bash $OPTIONSEARCH refine {} {q} )" \
+            --bind="ctrl-u:become(bash $OPTIONSEARCH refine {} {q} )" \
             --bind="ctrl-v:become(bash $OPTIONSEARCH source {} {q} )" \
             --query "$QUERY"
 }
