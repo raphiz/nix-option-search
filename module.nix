@@ -63,6 +63,9 @@ in {
     lib.optionalAttrs (options ? packages) {
       packages = lib.mkIf cfg.add-to-packages [cfg.package];
     }
+    // lib.optionalAttrs (options ? environment.defaultPackages) {
+      environment.defaultPackages = lib.mkIf cfg.add-to-packages [cfg.package];
+    }
     // lib.optionalAttrs (options ? home.packages) {
       home.packages = lib.mkIf cfg.add-to-packages [cfg.package];
     };

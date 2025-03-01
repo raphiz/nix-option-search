@@ -18,6 +18,10 @@
       type = lib.types.listOf lib.types.package;
       default = [];
     };
+    environment.defaultPackages = lib.options.mkOption {
+      type = lib.types.listOf lib.types.package;
+      default = [];
+    };
   };
   config = {
     devsh = pkgs.mkShellNoCC {
