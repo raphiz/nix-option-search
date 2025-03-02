@@ -28,7 +28,7 @@ function search() {
             --prompt="Nix Module Options (Press ? for help)> " \
             --bind '?:preview:echo -e "ctrl-v view source file\nctrl-u go to parent path of current option"' \
             --preview="bash $OPTIONSEARCH preview {}" \
-            --preview-window=wrap,up \
+            --preview-window=wrap,down \
             --bind="ctrl-u:become(bash $OPTIONSEARCH refine {} {q} '${LAST_QUERY:-}')" \
             --bind="ctrl-v:become(bash $OPTIONSEARCH source {} {q} )" \
             --query "$QUERY"
