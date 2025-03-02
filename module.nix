@@ -6,7 +6,7 @@
   ...
 }: let
   cfg = config.documentation.option-search;
-  packages = [cfg.package package-search pkgs.nix-search];
+  packages = [cfg.package package-search];
 
   option-search = pkgs.callPackage ./optionsearch.nix {};
   package-search = pkgs.callPackage ./package-search.nix {};
