@@ -6,7 +6,10 @@
   ...
 }: let
   cfg = config.documentation.option-search;
-  search = pkgs.callPackage ./optionsearch.nix {};
+  packages = [cfg.package package-search pkgs.nix-search];
+
+  option-search = pkgs.callPackage ./optionsearch.nix {};
+  package-search = pkgs.callPackage ./package-search.nix {};
   jsonPath = "/share/doc/nixos/options.json";
   # https://github.com/NixOS/nixpkgs/blob/nixos-24.11/nixos/lib/make-options-doc/default.nix
   optionsDoc = pkgs.nixosOptionsDoc {
@@ -54,20 +57,20 @@ in {
       description = "devshell option search";
       default = pkgs.writeShellApplication {
         name = cfg.name;
-        runtimeInputs = [search];
+        runtimeInputs = [option-search];
         text = "OPTIONS_JSON=${cfg.json}/${jsonPath} optionsearch";
       };
     };
   };
   config = lib.mkIf cfg.enable (
     lib.optionalAttrs (options ? packages) {
-      packages = [cfg.package];
+      packages = packages;
     }
     // lib.optionalAttrs (options ? environment.defaultPackages) {
-      environment.defaultPackages = [cfg.package];
+      environment.defaultPackages = packages;
     }
     // lib.optionalAttrs (options ? home.packages) {
-      home.packages = [cfg.package];
+      home.packages = packages;
     }
   );
 }
