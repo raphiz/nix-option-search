@@ -31,6 +31,7 @@
   };
 in {
   options.documentation.option-search = {
+    enable = lib.mkEnableOption "nix-option-search";
     json = lib.options.mkOption {
       type = lib.types.package;
       default = optionsDoc.optionsJSON;
@@ -57,7 +58,6 @@ in {
         text = "OPTIONS_JSON=${cfg.json}/${jsonPath} optionsearch";
       };
     };
-    enable = lib.mkEnableOption "nix-option-search" // {default = true;};
   };
   config = lib.mkIf cfg.enable (
     lib.optionalAttrs (options ? packages) {

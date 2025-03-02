@@ -16,20 +16,22 @@ options or any other additional options.
 
 ## Installation (using nix flakes)
 
-Configure the dependency via flake input
+Installation and activation requires three steps:
+
+- configure the dependency via flake input
+- add the provided `inputs.nix-option-search.nixosModules.default` to the `imports` list of one of your modules
+- activate option-search via `documentation.option-search.enable`
 
 ```nix
-inputs.nix-option-search.url = "github:ciderale/nix-option-search";
-```
-
-and add the provided `inputs.nix-option-search.nixosModules.default` in
-the `imports` list of one of your modules, e.g.
-
-```nix
+inputs = {
+	nix-option-search.url = "github:ciderale/nix-option-search";
+};
 outputs = inputs @ { nix-option-search, ... }: {
 
 	# ..somewhere in one of your modules..
-	{ imports = [nix-option-search.nixosModules.default]; }
+	{ imports = [nix-option-search.nixosModules.default];
+    documentation.option-search.enable = true;
+	}
 
 }
 ```
@@ -42,7 +44,7 @@ other frameworks building on the nix modules systems (like e.g. devenv.sh).
 
 The provided module defines options in `options.documentation.option-search`:
 
-- enable: (boolean) by default, add cli tool to the relevant packages options
+- enable: (boolean) add cli tool to the relevant packages options
 	- added to `environment.defaultPackages` for nixos
 	- added to `home.packages` for home-manager
 	- added to `packages` for devenv.sh
