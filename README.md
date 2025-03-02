@@ -28,6 +28,7 @@ the `imports` list of one of your modules, e.g.
 ```nix
 outputs = inputs @ { nix-option-search, ... }:
 
+# ..somewhere in one of your modules..
 { imports = [nix-option-search.nixosModules.default]; }
 ```
 
