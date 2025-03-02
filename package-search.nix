@@ -20,7 +20,9 @@ writeShellApplication {
     EOF
     )"
 
-    if [ $# -gt 0 ]; then
+    if [ "''${1:-}" = "--index" ]; then
+      nix-search --index --flake "''${2:-nixpkgs}"
+    elif [ $# -gt 0 ]; then
        QUERY=$(echo "$1" | cut -f1 -d ' ' | tr -d \')
        echo -e "Version  \tPackage   \tDescription"
        nix-search --json "$QUERY" | jq -r "$LISTING"
