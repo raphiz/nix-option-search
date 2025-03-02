@@ -5,7 +5,7 @@
   config,
   ...
 }: let
-  cfg = config.docs.option-search;
+  cfg = config.documentation.option-search;
   search = pkgs.callPackage ./optionsearch.nix {};
   jsonPath = "/share/doc/nixos/options.json";
   # https://github.com/NixOS/nixpkgs/blob/nixos-24.11/nixos/lib/make-options-doc/default.nix
@@ -30,7 +30,7 @@
       };
   };
 in {
-  options.docs.option-search = {
+  options.documentation.option-search = {
     json = lib.options.mkOption {
       type = lib.types.package;
       default = optionsDoc.optionsJSON;

@@ -40,7 +40,7 @@ other frameworks building on the nix modules systems (like e.g. devenv.sh).
 
 ## Summary of the configuration options
 
-The provided module defines options in `options.docs.option-search`:
+The provided module defines options in `options.documentation.option-search`:
 
 - enable: (boolean) by default, add cli tool to the relevant packages options
 	- added to `environment.defaultPackages` for nixos
