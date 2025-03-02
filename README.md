@@ -42,10 +42,10 @@ other frameworks building on the nix modules systems (like e.g. devenv.sh).
 
 The provided module defines options in `options.docs.option-search`:
 
-- `json`: (package) the derivation containing the (nixos) option.json
-- `name`: (string) the name of the option-search wrapper command
-- `package`: (package) the cli tool bundled `name` bundled with `option.json`
-- `add-to-packages`: (boolean) by default, add cli tool to the relevant packages options
+- enable: (boolean) by default, add cli tool to the relevant packages options
 	- added to `environment.defaultPackages` for nixos
 	- added to `home.packages` for home-manager
 	- added to `packages` for devenv.sh
+- `json`: (package) the derivation containing the (nixos) option.json
+- `name`: (string) the name of the nix-option-search wrapper command
+- `package`: (package) the cli tool bundled `name` bundled with `option.json`

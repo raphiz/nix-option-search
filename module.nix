@@ -57,16 +57,16 @@ in {
         text = "OPTIONS_JSON=${cfg.json}/${jsonPath} optionsearch";
       };
     };
-    add-to-packages = lib.mkEnableOption "Add to Packages" // {default = true;};
+    enable = lib.mkEnableOption "nix-option-search" // {default = true;};
   };
   config =
     lib.optionalAttrs (options ? packages) {
-      packages = lib.mkIf cfg.add-to-packages [cfg.package];
+      packages = lib.mkIf cfg.enable [cfg.package];
     }
     // lib.optionalAttrs (options ? environment.defaultPackages) {
-      environment.defaultPackages = lib.mkIf cfg.add-to-packages [cfg.package];
+      environment.defaultPackages = lib.mkIf cfg.enable [cfg.package];
     }
     // lib.optionalAttrs (options ? home.packages) {
-      home.packages = lib.mkIf cfg.add-to-packages [cfg.package];
+      home.packages = lib.mkIf cfg.enable [cfg.package];
     };
 }
