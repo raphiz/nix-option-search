@@ -29,7 +29,7 @@ function search() {
             --bind '?:preview:echo -e "ctrl-v view source file\nctrl-u go to parent path of current option"' \
             --preview="bash $OPTIONSEARCH preview {}" \
             --preview-window=wrap,up \
-            --bind="ctrl-u:become(bash $OPTIONSEARCH refine {} {q} )" \
+            --bind="ctrl-u:become(bash $OPTIONSEARCH refine {} {q} '${LAST_QUERY:-}')" \
             --bind="ctrl-v:become(bash $OPTIONSEARCH source {} {q} )" \
             --query "$QUERY"
 }
@@ -103,15 +103,14 @@ elif [ "$1" == "preview" ]; then
 elif [ "$1" == "refine" ]; then
       shift 1;
 
-      SELECTED=$1
-      CURRENT_QUERY=$2
+      SELECTED="$1"
+      CURRENT_QUERY="$2"
 
       #echo "Define parent level as query"
-      QUERY=^${SELECTED%.*}
+      QUERY="^${SELECTED%.*}"
 
-      if [ "$QUERY" == "$CURRENT_QUERY" ]; then
-            #echo "Move to parent if unchanged"
-            QUERY=${CURRENT_QUERY%.*}
+      if [ "$LAST_QUERY" == "$CURRENT_QUERY" ]; then
+            QUERY="${CURRENT_QUERY%.*}"
       fi
 
       if [ "$CURRENT_QUERY" == "$QUERY" ]; then
@@ -119,7 +118,7 @@ elif [ "$1" == "refine" ]; then
             QUERY=""
       fi
 
-      search
+      LAST_QUERY="$QUERY" search
 
 elif [ "$1" == "hm" ] || [ "$1" == "home-manager" ]; then
       JSON_DRV=$(nix build --no-link --print-out-paths home-manager\#docs-json)
