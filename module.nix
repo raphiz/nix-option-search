@@ -59,14 +59,15 @@ in {
     };
     enable = lib.mkEnableOption "nix-option-search" // {default = true;};
   };
-  config =
+  config = lib.mkIf cfg.enable (
     lib.optionalAttrs (options ? packages) {
-      packages = lib.mkIf cfg.enable [cfg.package];
+      packages = [cfg.package];
     }
     // lib.optionalAttrs (options ? environment.defaultPackages) {
-      environment.defaultPackages = lib.mkIf cfg.enable [cfg.package];
+      environment.defaultPackages = [cfg.package];
     }
     // lib.optionalAttrs (options ? home.packages) {
-      home.packages = lib.mkIf cfg.enable [cfg.package];
-    };
+      home.packages = [cfg.package];
+    }
+  );
 }
