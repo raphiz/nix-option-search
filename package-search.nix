@@ -29,7 +29,7 @@ writeShellApplication {
        --bind "change:+reload:sleep 0.1;$0 {q}" \
        --preview "jq -r '$DETAIL' <<< {4}" \
        --exact --reverse \
-       --delimiter '\t' --with-nth ..3 \
+       --delimiter '\t' --with-nth ..3 --accept-nth 2 \
        --prompt="Nixpkgs Search (Press ? for help)> " \
        --bind "?:preview:echo \"$INFO\"" \
        --header-lines 1 \
