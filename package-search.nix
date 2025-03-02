@@ -3,14 +3,13 @@
   nix-search,
   jq,
   fzf,
+  coreutils,
 }:
 writeShellApplication {
   name = "nix-package-search";
-  runtimeInputs = [nix-search jq fzf];
+  runtimeInputs = [nix-search jq fzf coreutils];
   text = ''
-    LISTING='def pad(x;n): x + (" "*(x | n - length )); map([pad(.version;10), pad(.path | sub("[^.]*.";"");15), .description, .|tostring] | join("\t") )|.[]'
-    DETAIL='["Path:\t\t"+.path,"Name:\t\t"+.name, "Version:\t"+.version, "",.description,"",.longDescription]|join("\n")'
-
+    NIXPKGS_EXPR=''${NIXPKGS_EXPR:-nixpkgs}
     INFO="$(cat <<EOF
     First word of Query is sent to nix-search
 
@@ -20,24 +19,38 @@ writeShellApplication {
     EOF
     )"
 
-    if [ "''${1:-}" = "--index" ]; then
-      nix-search --index --flake "''${2:-nixpkgs}"
-    elif [ $# -gt 0 ]; then
-       QUERY=$(echo "$1" | cut -f1 -d ' ' | tr -d \')
-       echo -e "Version  \tPackage   \tDescription"
-       nix-search --json "$QUERY" | jq -r "$LISTING"
-    else
-      echo | fzf \
-       --bind "change:+reload:sleep 0.1;$0 {q}" \
-       --preview "jq -r '$DETAIL' <<< {4}" \
-       --exact --reverse \
-       --delimiter '\t' --with-nth ..3 --accept-nth 2 \
-       --prompt="Nixpkgs Search (Press ? for help)> " \
-       --bind "?:preview:echo \"$INFO\"" \
-       --header-lines 1 \
-       --no-hscroll \
-       --preview-window=bottom,wrap \
-       --tiebreak=chunk,begin
-    fi
+    NO_LEGACY_PACKAGE='def packageName: sub("[^.]*.[^.]*.";"")'
+    PAD='def pad(x;n): x + (" "*(x | n - length ))'
+    FMT='to_entries | map([pad(.value.version;10), pad(.key|packageName;15), .value.description, .key]|@tsv) | .[]'
+    LISTING="$PAD; $NO_LEGACY_PACKAGE; $FMT"
+    DETAIL='[
+        ([
+          (if (.available) then "Available" else "" end),
+          (if (.unsupported) then "Unsupported" else "" end),
+          (if (.broken) then "Broken" else "" end),
+          (if (.unfree) then "Unfree" else "" end),
+          (if (.insecure) then "Insecure" else "" end)
+        ] | join("\t")),
+        "======",
+        "Name:       \t" + .name,
+        "Homepage:   \t" + .homepage,
+        "Description:\t" + .description,
+        (if (.longDescription>"") then "====== Long Description\n"+ .longDescription else "" end),
+        "====== Platform",
+        (.platforms|sort|join(","))
+    ] | join("\n")'
+
+    (echo -e "Version  \tPackage   \tDescription  \tKey"
+     nix search "$NIXPKGS_EXPR" --json "''${1:-.}" | jq -r "$LISTING"
+    ) | fzf --sync \
+    --exact --reverse \
+    --preview "nix eval --json '$NIXPKGS_EXPR#{4}.meta' --json | jq -r '$DETAIL'" \
+    --delimiter '\t' --with-nth ..3 --accept-nth 2 \
+    --prompt="Nixpkgs Search (Press ? for help)> " \
+    --bind "?:preview:echo \"$INFO\"" \
+    --header-lines 1 \
+    --no-hscroll \
+    --preview-window=bottom,wrap \
+    --tiebreak=chunk,begin
   '';
 }
