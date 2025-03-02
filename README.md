@@ -26,15 +26,17 @@ and add the provided `inputs.nix-option-search.nixosModules.default` in
 the `imports` list of one of your modules, e.g.
 
 ```nix
-outputs = inputs @ { nix-option-search, ... }:
+outputs = inputs @ { nix-option-search, ... }: {
 
-# ..somewhere in one of your modules..
-{ imports = [nix-option-search.nixosModules.default]; }
+	# ..somewhere in one of your modules..
+	{ imports = [nix-option-search.nixosModules.default]; }
+
+}
 ```
 
-Note: This module works not only with NixOS, but also with home-manager
-and other frameworks building on the nixos modules systems (like devenv.sh).
-The module is defined in `nixosModules` only to adhere to official flakes schema.
+Note: The module is defined in `nixosModules` only to adhere to official flakes
+schema. This module works not only with NixOS, but also with home-manager and
+other frameworks building on the nix modules systems (like e.g. devenv.sh).
 
 ## Summary of the configuration options
 
