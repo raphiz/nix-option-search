@@ -26,9 +26,9 @@ and add the provided `inputs.nix-option-search.nixosModules.default` in
 the `imports` list of one of your modules, e.g.
 
 ```nix
-inputs:
+outputs = inputs @ { nix-option-search, ... }:
 
-{ imports = [inputs.nixosModules.default]; }
+{ imports = [nix-option-search.nixosModules.default]; }
 ```
 
 Note: This module works not only with NixOS, but also with home-manager
