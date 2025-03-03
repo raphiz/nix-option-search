@@ -55,7 +55,7 @@ in {
     };
     package = lib.options.mkOption {
       type = lib.types.package;
-      description = "devshell option search";
+      description = "the nix-option-search wrapper including the options.json";
       default = pkgs.writeShellApplication {
         name = cfg.name;
         runtimeInputs = [option-search];
@@ -68,14 +68,18 @@ in {
     nixpkgs-expression = lib.options.mkOption {
       type = lib.types.str;
       description = ''
-        flake reference to nixpkgs.
+        flake reference to nixpkgs to be indexed.
 
         e.g. nixpkgs, github:nixos/nixpkgs
 
-        Defaults to the current nixpkgs version if "inputs" is available in the module inputs.
+        Defaults to the current nixpkgs version
+        if "inputs" is available in the module inputs.
 
-        That is, by adding "specialArgs = {inherit inputs;};" in your module boostrap code,
-        This option will use revision & narHash from "inputs.nixpkgs".
+        The above default is obtained by adding
+           "specialArgs = {inherit inputs;};"
+        in your module boostrap code. In that case, the
+           "revision & narHash from inputs.nixpkgs"
+        is used to index your actual nixpkgs version.
       '';
       example = "github:nixos/nixpkgs";
       default =
@@ -87,7 +91,7 @@ in {
     };
     package = lib.options.mkOption {
       type = lib.types.package;
-      description = "devshell option search";
+      description = "the nix-package-search wrapper including the nixpkgs flake reference";
       default = pkgs.writeShellApplication {
         name = "nix-package-search";
         runtimeInputs = [package-search];
