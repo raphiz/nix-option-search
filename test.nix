@@ -25,6 +25,7 @@
   };
   config = {
     documentation.option-search.enable = true;
+    documentation.package-search.enable = true;
     devsh = pkgs.mkShellNoCC {
       buildInputs = config.packages or [];
     };

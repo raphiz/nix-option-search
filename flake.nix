@@ -5,7 +5,7 @@
     nixpkgs.url = "github:nixos/nixpkgs";
   };
 
-  outputs = {
+  outputs = inputs @ {
     self,
     nixpkgs,
     ...
@@ -23,7 +23,7 @@
       default =
         (nixpkgs.lib.modules.evalModules {
           modules = [self.nixosModules.default ./test.nix];
-          specialArgs = {inherit pkgs;};
+          specialArgs = {inherit pkgs inputs;};
         })
         .config
         .devsh;

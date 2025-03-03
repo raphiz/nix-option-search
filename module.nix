@@ -1,4 +1,4 @@
-{
+ctx @ {
   pkgs,
   lib,
   options,
@@ -6,7 +6,8 @@
   ...
 }: let
   cfg = config.documentation.option-search;
-  packages = [cfg.package package-search];
+  cfg2 = config.documentation.package-search;
+  packages = (lib.optional cfg.enable cfg.package) ++ (lib.optional cfg2.enable cfg2.package);
 
   option-search = pkgs.callPackage ./optionsearch.nix {};
   package-search = pkgs.callPackage ./package-search.nix {};
@@ -62,7 +63,39 @@ in {
       };
     };
   };
-  config = lib.mkIf cfg.enable (
+  options.documentation.package-search = {
+    enable = lib.mkEnableOption "nix-package-search";
+    nixpkgs-expression = lib.options.mkOption {
+      type = lib.types.str;
+      description = ''
+        flake reference to nixpkgs.
+
+        e.g. nixpkgs, github:nixos/nixpkgs
+
+        Defaults to the current nixpkgs version if "inputs" is available in the module inputs.
+
+        That is, by adding "specialArgs = {inherit inputs;};" in your module boostrap code,
+        This option will use revision & narHash from "inputs.nixpkgs".
+      '';
+      example = "github:nixos/nixpkgs";
+      default =
+        if (ctx ? inputs.nixpkgs)
+        then let
+          nixpkgs = ctx.inputs.nixpkgs;
+        in "github:nixos/nixpkgs/${nixpkgs.sourceInfo.rev}?narHash=${nixpkgs.narHash}"
+        else "nixpkgs";
+    };
+    package = lib.options.mkOption {
+      type = lib.types.package;
+      description = "devshell option search";
+      default = pkgs.writeShellApplication {
+        name = "nix-package-search";
+        runtimeInputs = [package-search];
+        text = ''NIXPKGS_EXPR="${cfg2.nixpkgs-expression}" nix-package-search "''${@}"'';
+      };
+    };
+  };
+  config =
     lib.optionalAttrs (options ? packages) {
       packages = packages;
     }
@@ -71,6 +104,5 @@ in {
     }
     // lib.optionalAttrs (options ? home.packages) {
       home.packages = packages;
-    }
-  );
+    };
 }
