@@ -31,6 +31,7 @@ function search() {
             --preview-window=wrap,down \
             --bind="ctrl-u:become(bash $OPTIONSEARCH refine {} {q})" \
             --bind="ctrl-v:become(bash $OPTIONSEARCH source {} {q} )" \
+            --track \
             --query "$QUERY"
 }
 
