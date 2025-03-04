@@ -29,7 +29,7 @@ function search() {
             --bind '?:preview:echo -e "ctrl-v view source file\nctrl-u go to parent path of current option"' \
             --preview="bash $OPTIONSEARCH preview {}" \
             --preview-window=wrap,down \
-            --bind="ctrl-u:become(bash $OPTIONSEARCH refine {} {q} '${LAST_QUERY:-}')" \
+            --bind="ctrl-u:become(bash $OPTIONSEARCH refine {} {q})" \
             --bind="ctrl-v:become(bash $OPTIONSEARCH source {} {q} )" \
             --query "$QUERY"
 }
@@ -106,16 +106,14 @@ elif [ "$1" == "refine" ]; then
       SELECTED="$1"
       CURRENT_QUERY="$2"
 
-      #echo "Define parent level as query"
-      QUERY="^${SELECTED%.*}"
-
-      if [ "$LAST_QUERY" == "$CURRENT_QUERY" ]; then
-            QUERY="${CURRENT_QUERY%.*}"
-      fi
-
-      if [ "$CURRENT_QUERY" == "$QUERY" ]; then
-            #echo "Remove query if no more parent"
-            QUERY=""
+      if [ "${LAST_QUERY:-nopreviousquery}" == "$CURRENT_QUERY" ]; then
+            # consecutive calls to "refine" => go one level up
+            # strip away right most part with '.' or '^' as separator
+            # the ^ corresponds to the top-most element
+            QUERY="${CURRENT_QUERY%[\^.]*}"
+      else
+            # define the parent of the selection as query
+            QUERY="^${SELECTED%.*}"
       fi
 
       LAST_QUERY="$QUERY" search
