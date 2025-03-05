@@ -12,6 +12,17 @@ ctx @ {
   option-search = pkgs.callPackage ./optionsearch.nix {};
   package-search = pkgs.callPackage ./package-search.nix {};
   jsonPath = "/share/doc/nixos/options.json";
+
+  # removes the prefix if the modules is imported as a submodule (e.g. devenv in flake-parts)
+  # since all options (referenced from here) have this prefix, it's worth dropping the prefix
+  dropPrefix = let
+    len = lib.strings.stringLength;
+    someOptionPath = "documentation.option-search.enable";
+    someOption = lib.attrsets.getAttrFromPath (lib.strings.splitString "." someOptionPath) options;
+    optionPrefixLen = (len "${someOption}") - (len someOptionPath);
+  in
+    optionName: builtins.substring optionPrefixLen (len optionName) optionName;
+
   # https://github.com/NixOS/nixpkgs/blob/nixos-24.11/nixos/lib/make-options-doc/default.nix
   optionsDoc = pkgs.nixosOptionsDoc {
     inherit options;
@@ -26,6 +37,7 @@ ctx @ {
         else {text = "<error> typically unsupported system derivation";};
     in
       option
+      // {name = dropPrefix option.name;}
       // lib.optionalAttrs (option ? default) {
         default = handleUnsupported option.default;
       }
