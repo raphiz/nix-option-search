@@ -8,15 +8,24 @@
   nixosOptionsDoc,
   runCommand,
   lib,
-}: {
+}: rec {
   cli = writeShellApplication {
     name = "optionsearch";
     runtimeInputs = [jq fzf nix gnused coreutils];
     text = builtins.readFile ./optionsearch.sh;
   };
+  cliWithOptionsJson = optionsJson: name:
+    writeShellApplication {
+      name = name;
+      runtimeInputs = [cli];
+      text = "optionsearch";
+      runtimeEnv = {OPTIONS_JSON = optionsJson;};
+      derivationArgs = {inherit optionsJson;};
+    };
   documentOptions = {
     options,
     dropPrefix,
+    name ? "nix-option-search",
   }: let
     optionsDoc = nixosOptionsDoc {
       inherit options;
@@ -41,9 +50,9 @@
     };
     jsonPath = "/share/doc/nixos/options.json";
     optionsDocJSON = optionsDoc.optionsJSON;
-    optionsJSON = runCommand "options.json" {} ''
+    json = runCommand "options.json" {} ''
       cp ${optionsDocJSON}/${jsonPath} $out;
     '';
-  in
-    optionsJSON;
+    cli = cliWithOptionsJson json name;
+  in {inherit cli json;};
 }

@@ -21,18 +21,14 @@ ctx @ {
     optionPrefixLen = (len "${someOption}") - (len someOptionPath);
   in
     optionName: builtins.substring optionPrefixLen (len optionName) optionName;
+
+  cli = option-search.documentOptions {
+    inherit options dropPrefix;
+    inherit (cfg) name;
+  };
 in {
   options.documentation.option-search = {
     enable = lib.mkEnableOption "nix-option-search";
-    json = lib.options.mkOption {
-      type = lib.types.package;
-      default = option-search.documentOptions {inherit options dropPrefix;};
-      description = ''
-        Configuration options documentation based on nixos module system.
-
-        For details see: https://github.com/NixOS/nixpkgs/blob/nixos-24.11/nixos/lib/make-options-doc/default.nix
-      '';
-    };
     name = lib.options.mkOption {
       type = lib.types.str;
       default = "nix-option-search";
@@ -41,12 +37,12 @@ in {
     };
     package = lib.options.mkOption {
       type = lib.types.package;
-      description = "the nix-option-search wrapper including the options.json";
-      default = pkgs.writeShellApplication {
-        name = cfg.name;
-        runtimeInputs = [option-search.cli];
-        text = "OPTIONS_JSON=${cfg.json} optionsearch";
-      };
+      description = ''
+        the nix-option-search wrapper including the options.json.
+
+        the derivation provides options.json derivation via attribute ".optionsJson"
+      '';
+      default = cli.cli;
     };
   };
   options.documentation.package-search = {
