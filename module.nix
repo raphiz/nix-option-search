@@ -9,7 +9,7 @@ ctx @ {
   cfg2 = config.documentation.package-search;
   packages = (lib.optional cfg.enable cfg.package) ++ (lib.optional cfg2.enable cfg2.package);
 
-  option-search = pkgs.callPackage ./optionsearch.nix {};
+  option-search = pkgs.callPackages ./optionsearch.nix {};
   package-search = pkgs.callPackage ./package-search.nix {};
   jsonPath = "/share/doc/nixos/options.json";
 
@@ -22,35 +22,12 @@ ctx @ {
     optionPrefixLen = (len "${someOption}") - (len someOptionPath);
   in
     optionName: builtins.substring optionPrefixLen (len optionName) optionName;
-
-  # https://github.com/NixOS/nixpkgs/blob/nixos-24.11/nixos/lib/make-options-doc/default.nix
-  optionsDoc = pkgs.nixosOptionsDoc {
-    inherit options;
-    warningsAreErrors = false;
-    # make it work for home-manager too
-    transformOptions = option: let
-      handleUnsupported = x: let
-        tried = builtins.tryEval x;
-      in
-        if tried.success
-        then tried.value
-        else {text = "<error> typically unsupported system derivation";};
-    in
-      option
-      // {name = dropPrefix option.name;}
-      // lib.optionalAttrs (option ? default) {
-        default = handleUnsupported option.default;
-      }
-      // lib.optionalAttrs (option ? example) {
-        example = handleUnsupported option.example;
-      };
-  };
 in {
   options.documentation.option-search = {
     enable = lib.mkEnableOption "nix-option-search";
     json = lib.options.mkOption {
       type = lib.types.package;
-      default = optionsDoc.optionsJSON;
+      default = option-search.documentOptions {inherit options dropPrefix;};
       description = ''
         Configuration options documentation based on nixos module system.
 
@@ -70,7 +47,7 @@ in {
       description = "the nix-option-search wrapper including the options.json";
       default = pkgs.writeShellApplication {
         name = cfg.name;
-        runtimeInputs = [option-search];
+        runtimeInputs = [option-search.cli];
         text = "OPTIONS_JSON=${cfg.json}/${jsonPath} optionsearch";
       };
     };
