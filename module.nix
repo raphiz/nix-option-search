@@ -11,7 +11,6 @@ ctx @ {
 
   option-search = pkgs.callPackages ./optionsearch.nix {};
   package-search = pkgs.callPackage ./package-search.nix {};
-  jsonPath = "/share/doc/nixos/options.json";
 
   # removes the prefix if the modules is imported as a submodule (e.g. devenv in flake-parts)
   # since all options (referenced from here) have this prefix, it's worth dropping the prefix
@@ -31,8 +30,6 @@ in {
       description = ''
         Configuration options documentation based on nixos module system.
 
-        The actual json file is located at ${jsonPath}.
-
         For details see: https://github.com/NixOS/nixpkgs/blob/nixos-24.11/nixos/lib/make-options-doc/default.nix
       '';
     };
@@ -48,7 +45,7 @@ in {
       default = pkgs.writeShellApplication {
         name = cfg.name;
         runtimeInputs = [option-search.cli];
-        text = "OPTIONS_JSON=${cfg.json}/${jsonPath} optionsearch";
+        text = "OPTIONS_JSON=${cfg.json} optionsearch";
       };
     };
   };

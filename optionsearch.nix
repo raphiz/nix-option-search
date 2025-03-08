@@ -6,6 +6,7 @@
   gnused,
   coreutils,
   nixosOptionsDoc,
+  runCommand,
   lib,
 }: {
   cli = writeShellApplication {
@@ -38,7 +39,11 @@
           example = handleUnsupported option.example;
         };
     };
+    jsonPath = "/share/doc/nixos/options.json";
     optionsDocJSON = optionsDoc.optionsJSON;
+    optionsJSON = runCommand "options.json" {} ''
+      cp ${optionsDocJSON}/${jsonPath} $out;
+    '';
   in
-    optionsDocJSON;
+    optionsJSON;
 }
