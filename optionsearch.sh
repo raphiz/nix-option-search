@@ -79,9 +79,10 @@ elif [ "$1" == "preview" ]; then
       DEFAULT=$(echo "$RAW" | jq -r '.default.text // empty')
       DECLARATION=$(echo "$RAW" | jq -r '.declarations[]')
       EXAMPLE=$(echo "$RAW" | jq -r '.example.text // empty')
+      READONLY=$(echo "$RAW" | jq -r 'if .readOnly then " READONLY" else "" end')
 
       echo "NAME   : $NAME"
-      echo "DEFAULT: $DEFAULT"
+      echo "DEFAULT:$READONLY $DEFAULT"
       echo "TYPE   : $TYPE"
       echo "DECLARATION   : $DECLARATION"
       echo "--------------------------------------------------------------"

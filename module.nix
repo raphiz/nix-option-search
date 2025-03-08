@@ -43,6 +43,7 @@ in {
         the derivation provides options.json derivation via attribute ".optionsJson"
       '';
       default = cli.cli;
+      readOnly = true;
     };
   };
   options.documentation.package-search = {
