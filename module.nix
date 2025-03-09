@@ -7,7 +7,7 @@ ctx @ {
 }: let
   cfg = config.documentation.option-search;
   cfg2 = config.documentation.package-search;
-  packages = (lib.optional cfg.enable cfg.package) ++ (lib.optional cfg2.enable cfg2.package);
+  packages = config.documentation.packages;
 
   option-search = pkgs.callPackages ./optionsearch.nix {};
   package-search = pkgs.callPackage ./package-search.nix {};
@@ -27,6 +27,12 @@ ctx @ {
     inherit (cfg) name;
   };
 in {
+  options.documentation.packages = lib.options.mkOption {
+    type = lib.types.listOf lib.types.package;
+    description = ''List of documentation related packages to include'';
+    default = [];
+    internal = true;
+  };
   options.documentation.option-search = {
     enable = lib.mkEnableOption "nix-option-search";
     name = lib.options.mkOption {
@@ -83,7 +89,10 @@ in {
     };
   };
   config =
-    lib.optionalAttrs (options ? packages) {
+    {
+      documentation.packages = (lib.optional cfg.enable cfg.package) ++ (lib.optional cfg2.enable cfg2.package);
+    }
+    // lib.optionalAttrs (options ? packages) {
       packages = packages;
     }
     // lib.optionalAttrs (options ? environment.defaultPackages) {
