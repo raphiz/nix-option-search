@@ -22,14 +22,11 @@
     };
     packages = forAllSystems (
       pkgs: let
-        nix-option-search = (pkgs.callPackages ./nix-option-search.nix {}).cli;
+        nix-option-search-cli = (pkgs.callPackages ./nix-option-search.nix {}).cli;
         nix-package-search = pkgs.callPackage ./nix-package-search.nix {};
       in
-        {
-          inherit nix-option-search nix-package-search;
-          default = nix-option-search;
-        }
-        // (pkgs.callPackages ./standalone.nix {inherit nix-option-search;})
+        {inherit nix-package-search nix-option-search-cli;}
+        // (pkgs.callPackages ./standalone.nix {inherit nix-option-search-cli;})
     );
     devShells = forAllSystems (pkgs: {
       default =

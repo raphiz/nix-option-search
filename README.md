@@ -124,20 +124,12 @@ The provided module defines options in `options.documentation.option-search`:
 - `name`: (string) the name of the nix-option-search wrapper command
 - `package`: (package) the cli tool bundled `name` bundled with `option.json`
 
-# Standalone search commands
+# Standalone search commands (flake package outputs)
 
-The flake defines output derivation for various module systems referring to
-the lastest flake version available:
-
-- nixos-option-search
-- devenv-option-search
-- home-manager-option-search
-- kubenix-option-search
-
-Additionally, there are:
-
-- nix-package-search: point env variable OPTION_JSON to an "option.json" file
-- any-option-search: define OPTION_JSON_EXPRESSION & OPTION_JSON_EXPRESSION
-    - e.g. `OPTION_JSON_EXPRESSION='github:hall/kubenix#docs' OPTION_JSON_PATH="" nix run .\#any-option-search`
-- nix-option-search: search nixpkgs packages
-  - the NIXPGS_EXPR (default nixpkgs) defines which version to search through
+- nix-option-search (default)
+  - wrapper including 'nixos', 'home-manager', 'devenv', 'kubenix' options
+  - always builds the option.json from the latest github revision
+- nix-option-search-cli
+  - without any wrapper for options.json
+- nix-package-search: search nixpkgs using fzf (based on `nix-search`)
+  - set NIXPGS_EXPR (default nixpkgs) to define the version to search

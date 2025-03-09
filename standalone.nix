@@ -1,46 +1,57 @@
 {
   writeShellApplication,
-  nix-option-search,
+  nix-option-search-cli,
 }: let
-  defaultPath = "/share/doc/nixos/options.json";
-  makeSearch = {
-    name,
-    optionJsonExpression,
-    optionJsonPath ? defaultPath,
-  }: let
-    binName = "${name}-option-search";
-  in {
-    "${binName}" = writeShellApplication {
-      name = binName;
-      runtimeInputs = [nix-option-search];
-      text = ''
-        JSON_DRV=$(nix build --no-link --print-out-paths ${optionJsonExpression})
-        OPTIONS_JSON=$JSON_DRV${optionJsonPath} nix-option-search
-      '';
-    };
+  nix-option-search = writeShellApplication {
+    name = "nix-option-search";
+    runtimeInputs = [nix-option-search-cli];
+    text = ''
+      function option_json_path() {
+        JSON_PATH=$1
+        shift
+        JSON_DRV=$(nix build --no-link --print-out-paths "''${@}")
+        echo "$JSON_DRV''${JSON_PATH}"
+      }
+
+      if [ -z "''${OPTIONS_JSON:-}" ]; then
+        case "''${1:-usage}" in
+
+          home-manager|hm)
+            OPTIONS_JSON=$(option_json_path "/share/doc/home-manager/options.json" "home-manager#docs-json")
+            ;;
+
+          nixos)
+            OPTIONS_JSON=$(option_json_path "/share/doc/nixos/options.json" --impure --expr '(import (builtins.getFlake "nixpkgs" + /nixos/release.nix) {}).options')
+            ;;
+
+          devenv)
+            OPTIONS_JSON=$(option_json_path "/share/doc/nixos/options.json" "github:cachix/devenv#devenv-docs-options-json")
+            ;;
+
+          kubenix)
+            OPTIONS_JSON=$(option_json_path "" "github:hall/kubenix#docs");
+            ;;
+
+          custom)
+            shift 1
+            echo "Using custom definition: $*"
+            OPTIONS_JSON=$(option_json_path "''${@}")
+            ;;
+
+          usage|*)
+            echo "Usage: $0 home-manager|hm|nixos|devenv|kubenix|custom"
+            echo "  custom: arg2-*: nix build argument for options.json derivation build"
+            echo "  custom: arg1  : path to options.json within the above built derivation"
+            exit 1
+            ;;
+        esac
+      fi
+      echo "$OPTIONS_JSON"
+      export OPTIONS_JSON
+      nix-option-search
+    '';
   };
-in
-  makeSearch {
-    name = "home-manager";
-    optionJsonExpression = "home-manager#docs-json";
-    optionJsonPath = "/share/doc/home-manager/options.json";
-  }
-  // makeSearch {
-    name = "nixos";
-    optionJsonExpression = ''--impure --expr '(import (builtins.getFlake "nixpkgs" + /nixos/release.nix) {}).options' '';
-  }
-  // makeSearch {
-    name = "devenv";
-    optionJsonExpression = "github:cachix/devenv#devenv-docs-options-json";
-  }
-  // makeSearch {
-    name = "kubenix";
-    optionJsonExpression = "github:hall/kubenix#docs";
-    optionJsonPath = "";
-  }
-  // makeSearch {
-    name = "any"; # use for other tools not listed here by setting environment variables
-    # OPTION_JSON_EXPRESSION='github:hall/kubenix#docs' OPTION_JSON_PATH="" nix run .\#any-option-search
-    optionJsonExpression = ''"$OPTION_JSON_EXPRESSION"'';
-    optionJsonPath = ''"''${OPTION_JSON_PATH-${defaultPath}}" '';
-  }
+in {
+  inherit nix-option-search;
+  default = nix-option-search;
+}
