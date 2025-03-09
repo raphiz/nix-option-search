@@ -15,6 +15,8 @@
       (system: function nixpkgs.legacyPackages.${system});
   in {
     nixosModules.default = ./module.nix;
+    nixosModules.parts = ./parts-module.nix;
+    nixosModules.parts-devenv = ./parts-devenv-module.nix;
     packages = forAllSystems (pkgs: rec {
       optionsearch = pkgs.callPackage ./optionsearch.nix {};
       default = optionsearch;
