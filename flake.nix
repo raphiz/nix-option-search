@@ -20,11 +20,17 @@
       flake-parts = ./parts-module.nix;
       flake-parts-devenv = ./parts-devenv-module.nix;
     };
-    packages = forAllSystems (pkgs: rec {
-      nix-option-search = (pkgs.callPackages ./nix-option-search.nix {}).cli;
-      nix-package-search = pkgs.callPackage ./nix-package-search.nix {};
-      default = nix-option-search;
-    });
+    packages = forAllSystems (
+      pkgs: let
+        nix-option-search = (pkgs.callPackages ./nix-option-search.nix {}).cli;
+        nix-package-search = pkgs.callPackage ./nix-package-search.nix {};
+      in
+        {
+          inherit nix-option-search nix-package-search;
+          default = nix-option-search;
+        }
+        // (pkgs.callPackages ./standalone.nix {inherit nix-option-search;})
+    );
     devShells = forAllSystems (pkgs: {
       default =
         (nixpkgs.lib.modules.evalModules {

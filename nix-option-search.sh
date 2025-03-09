@@ -50,13 +50,8 @@ function raw_entry() {
 if [ $# == 0 ]; then
 
       if [ "${OPTIONS_JSON:-}" == "" ]; then
-            echo "Missing OPTIONS_JSON. Define path via env var or select source:"
-            echo "  for nixos:        $OPTIONSEARCH nixos"
-            echo "  for devenv:       $OPTIONSEARCH devenv"
-            echo "  for kubenix:      $OPTIONSEARCH k    (or kubenix)"
-            echo "  for home-manager: $OPTIONSEARCH hm   (or home-manager)"
+            echo "Missing OPTIONS_JSON. Define path via env var."
             echo ""
-            echo "keybindings in search: ctrl-g: refine to given selection"
             echo "EnvVar: SEARCH=keys or description: index key only or including description"
             exit 1
       fi
@@ -119,17 +114,4 @@ elif [ "$1" == "refine" ]; then
       fi
 
       LAST_QUERY="$QUERY" search
-
-elif [ "$1" == "hm" ] || [ "$1" == "home-manager" ]; then
-      JSON_DRV=$(nix build --no-link --print-out-paths home-manager\#docs-json)
-      OPTIONS_JSON=$JSON_DRV/share/doc/home-manager/options.json $OPTIONSEARCH
-elif [ "$1" == "nixos" ]; then
-      JSON_DRV=$(nix-build '<nixpkgs/nixos/release.nix>' -A options --no-out-link)
-      OPTIONS_JSON=$JSON_DRV/share/doc/nixos/options.json $OPTIONSEARCH
-elif [ "$1" == "devenv" ]; then
-      JSON_DRV=$(yes "N" | nix build --no-link --print-out-paths github:cachix/devenv/v1.0.8\#devenv-docs-options-json)
-      OPTIONS_JSON=$JSON_DRV/share/doc/nixos/options.json $OPTIONSEARCH
-elif [ "$1" == "k" ] || [ "$1" == "kubenix" ]; then
-      JSON_DRV=$(nix build github:hall/kubenix\#docs --no-link --print-out-paths)
-      OPTIONS_JSON=$JSON_DRV $OPTIONSEARCH
 fi;
