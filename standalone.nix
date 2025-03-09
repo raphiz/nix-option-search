@@ -46,7 +46,6 @@
             ;;
         esac
       fi
-      echo "$OPTIONS_JSON"
       export OPTIONS_JSON
       nix-option-search
     '';
