@@ -24,7 +24,7 @@
     };
   documentOptions = {
     options,
-    dropPrefix,
+    dropPrefix ? x: x,
     name ? "nix-option-search",
   }: let
     optionsDoc = nixosOptionsDoc {
