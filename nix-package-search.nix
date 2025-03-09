@@ -1,17 +1,16 @@
 {
   writeShellApplication,
-  nix-search,
   jq,
   fzf,
   coreutils,
 }:
 writeShellApplication {
   name = "nix-package-search";
-  runtimeInputs = [nix-search jq fzf coreutils];
+  runtimeInputs = [jq fzf coreutils];
   text = ''
     NIXPKGS_EXPR=''${NIXPKGS_EXPR:-nixpkgs}
     INFO="$(cat <<EOF
-    First word of Query is sent to nix-search
+    First word of Query is sent to nix search
 
     Additional words are filtering in fzf:
     - ! Prefix to exclude matches
