@@ -1,44 +1,46 @@
 {
   writeShellApplication,
-  nix-search,
-  jq,
-  fzf,
-  coreutils,
   nix-option-search,
-}: {
-  home-manager-option-search = writeShellApplication {
-    name = "home-manager-option-search";
-    runtimeInputs = [nix-option-search];
-    text = ''
-      JSON_DRV=$(nix build --no-link --print-out-paths home-manager\#docs-json)
-      OPTIONS_JSON=$JSON_DRV/share/doc/home-manager/options.json nix-option-search
-    '';
+}: let
+  defaultPath = "/share/doc/nixos/options.json";
+  makeSearch = {
+    name,
+    optionJsonExpression,
+    optionJsonPath ? defaultPath,
+  }: let
+    binName = "${name}-option-search";
+  in {
+    "${binName}" = writeShellApplication {
+      name = binName;
+      runtimeInputs = [nix-option-search];
+      text = ''
+        JSON_DRV=$(nix build --no-link --print-out-paths ${optionJsonExpression})
+        OPTIONS_JSON=$JSON_DRV${optionJsonPath} nix-option-search
+      '';
+    };
   };
-  nixos-option-search = writeShellApplication {
-    name = "home-manager-option-search";
-    runtimeInputs = [nix-option-search];
-    text = ''
-      JSON_DRV=$(
-          nix build --no-link --print-out-paths --impure \
-          --expr '(import (builtins.getFlake "nixpkgs" + /nixos/release.nix) {}).options'
-      )
-      OPTIONS_JSON=$JSON_DRV/share/doc/nixos/options.json nix-option-search
-    '';
-  };
-  devenv-option-search = writeShellApplication {
-    name = "devenv-option-search";
-    runtimeInputs = [nix-option-search];
-    text = ''
-      JSON_DRV=$(nix build --no-link --print-out-paths github:cachix/devenv#devenv-docs-options-json || echo "$?")
-      OPTIONS_JSON=$JSON_DRV/share/doc/nixos/options.json nix-option-search
-    '';
-  };
-  kubenix-option-search = writeShellApplication {
-    name = "kubenix-option-search";
-    runtimeInputs = [nix-option-search];
-    text = ''
-      JSON_DRV=$(nix build --no-link --print-out-paths github:hall/kubenix#docs)
-      OPTIONS_JSON=$JSON_DRV nix-option-search
-    '';
-  };
-}
+in
+  makeSearch {
+    name = "home-manager";
+    optionJsonExpression = "home-manager#docs-json";
+    optionJsonPath = "/share/doc/home-manager/options.json";
+  }
+  // makeSearch {
+    name = "nixos";
+    optionJsonExpression = ''--impure --expr '(import (builtins.getFlake "nixpkgs" + /nixos/release.nix) {}).options' '';
+  }
+  // makeSearch {
+    name = "devenv";
+    optionJsonExpression = "github:cachix/devenv#devenv-docs-options-json";
+  }
+  // makeSearch {
+    name = "kubenix";
+    optionJsonExpression = "github:hall/kubenix#docs";
+    optionJsonPath = "";
+  }
+  // makeSearch {
+    name = "any"; # use for other tools not listed here by setting environment variables
+    # OPTION_JSON_EXPRESSION='github:hall/kubenix#docs' OPTION_JSON_PATH="" nix run .\#any-option-search
+    optionJsonExpression = ''"$OPTION_JSON_EXPRESSION"'';
+    optionJsonPath = ''"''${OPTION_JSON_PATH-${defaultPath}}" '';
+  }
