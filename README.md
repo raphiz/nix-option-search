@@ -95,7 +95,7 @@ The latter is helpful when using flake-parts modules other than devenv.sh
 ### Flake-Parts Setup (without Devenv.sh)
 
 The module `nix-option-search.modules.flake-parts` exports the `flake-parts-options-search`
-package via `outputs.packages.$arch.flake-parts-option-search. It can be run with
+package via `outputs.packages.$arch.flake-parts-option-search`. It can be run with
 `nix run .#flake-parts-option-search` or accessed in perSystem configuration via
 `config.packages.flake-parts-option-search`.
 
@@ -109,18 +109,6 @@ outputs = inputs @ { flake-parts, ...}:
   };
   perSystem = {config,...}: {
     # use `config.packages.flake-parts-option-search`
-  };
-}
-```
-
-
-
-```nix
-outputs = inputs @ { flake-parts, ...}:
-  flake-parts.lib.mkFlake {inherit inputs;} {
-    imports = [
-      inputs.nix-option-search.modules.flake-parts-devenv # add this line
-    ];
   };
 }
 ```
@@ -148,8 +136,8 @@ the lastest flake version available:
 
 Additionally, there are:
 
-─ nix-package-search: point env variable OPTION_JSON to an "option.json" file
+- nix-package-search: point env variable OPTION_JSON to an "option.json" file
 - any-option-search: define OPTION_JSON_EXPRESSION & OPTION_JSON_EXPRESSION
-    - e.g. OPTION_JSON_EXPRESSION='github:hall/kubenix#docs' OPTION_JSON_PATH="" nix run .\#any-option-search
+    - e.g. `OPTION_JSON_EXPRESSION='github:hall/kubenix#docs' OPTION_JSON_PATH="" nix run .\#any-option-search`
 - nix-option-search: search nixpkgs packages
   - the NIXPGS_EXPR (default nixpkgs) defines which version to search through
