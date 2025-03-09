@@ -10,15 +10,15 @@
   lib,
 }: rec {
   cli = writeShellApplication {
-    name = "optionsearch";
+    name = "nix-option-search";
     runtimeInputs = [jq fzf nix gnused coreutils];
-    text = builtins.readFile ./optionsearch.sh;
+    text = builtins.readFile ./nix-option-search.sh;
   };
   cliWithOptionsJson = optionsJson: name:
     writeShellApplication {
       name = name;
       runtimeInputs = [cli];
-      text = "optionsearch";
+      text = cli.name;
       runtimeEnv = {OPTIONS_JSON = optionsJson;};
       derivationArgs = {inherit optionsJson;};
     };

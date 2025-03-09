@@ -9,7 +9,7 @@ ctx @ {
   cfg2 = config.documentation.package-search;
   packages = config.documentation.packages;
 
-  option-search = pkgs.callPackages ./optionsearch.nix {};
+  option-search = pkgs.callPackages ./nix-option-search.nix {};
   package-search = pkgs.callPackage ./package-search.nix {};
 
   # removes the prefix if the modules is imported as a submodule (e.g. devenv in flake-parts)
