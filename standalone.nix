@@ -55,7 +55,7 @@
           fzf|*)
             SELECTION="$(echo "$KNOWN" | tr '|' '\n' | fzf --no-sort)"
             if [ -n "$SELECTION" ]; then
-              $0 "$SELECTION"
+              exec $0 "$SELECTION"
             fi
             ;;
         esac
