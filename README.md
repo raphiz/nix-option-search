@@ -1,17 +1,45 @@
 # TUI for nix module options search
 
-This flake provides the `nix-option-search` command to efficiently search for
-available options using `fzf`.
+The goal of `nix-option-search` is to efficiently search through options
+provided by the nix module system. https://search.nixos.org/options is very
+nice, but works only for nixos options. But there are others like home-manager,
+devenv, kubenix, etc., and probably more to come. nix-option-search is one 
+command line tool to search them all.
+
+The approach is to build `options.json` and interactively explore them using
+[fzf](https://junegunn.github.io/fzf/). Fzf allows for efficient filtering
+and detailed option previews. Simple, yet effective.
+
+The extensibility is a key feature of the nix module system. It is simple to
+(locally) define additional options or even entirely new (convenience) modules.
+Those module options are simply not present in an online system. That is a
+problem `nix-option-search` tries to address. The aim is to extract
+`options.json` from the locally defined setup where all module options are
+available. This avoids version mismatches and you always explore exactly the
+option that are available.
+
+NOTE: The tools is still in an experimental stage. That means, it can be used,
+but things like key-bindings, preview format, and the module-based integration
+are subject to change.
+
+# Standalone Usage
+
+```sh
+nix run github:ciderale/nix-option-search [module-system]
+```
+
+The currently supported module systems are "nixos", "home-manager", "devenv", or "kubenix".
+If no argument is provided, a prompt allows for selecting the module system using fzf.
+
+nix-option-search then allows for interactive exploration of the module
+options. There is an detailed preview for the selected option. Help on
+additional key-bindings is optained by pressing CTRL-?.
+
+# Module Integration (Experimental, subject to changes)
 
 This tool directly uses the options of your module configuration. It therefore
 cannot have a version mismatch and also shows your locally defined custom
 options or any other additional options.
-
-## Usage
-
-- Simply run `nix-options-search` to interactively explore all options in fzf.
-- ctrl-v: View the nix file that defines the selected option
-- ctrl-u: Go up to the parent key of the current selected option
 
 
 ## Installation (using nix flakes)
@@ -104,7 +132,7 @@ package via `outputs.packages.$arch.flake-parts-option-search`. It can be run wi
 outputs = inputs @ { flake-parts, ...}:
   flake-parts.lib.mkFlake {inherit inputs;} {
     imports = [
-      inputs.nix-option-search.modules.flake-parts-devenv # add this line
+      inputs.nix-option-search.modules.flake-parts # add this line
     ];
   };
   perSystem = {config,...}: {
