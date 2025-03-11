@@ -1,10 +1,12 @@
 {
   writeShellApplication,
   nix-option-search-cli,
+  fzf,
+  coreutils,
 }: let
   nix-option-search = writeShellApplication {
     name = "nix-option-search";
-    runtimeInputs = [nix-option-search-cli];
+    runtimeInputs = [nix-option-search-cli fzf coreutils];
     text = ''
       function option_json_path() {
         JSON_PATH=$1
@@ -14,7 +16,9 @@
       }
 
       if [ -z "''${OPTIONS_JSON:-}" ]; then
-        case "''${1:-usage}" in
+        KNOWN="devenv|home-manager|nixos|kubenix"
+        EXTRA="hm|custom"
+        case "''${1:-fzf}" in
 
           home-manager|hm)
             OPTIONS_JSON=$(option_json_path "/share/doc/home-manager/options.json" "home-manager#docs-json")
@@ -38,11 +42,21 @@
             OPTIONS_JSON=$(option_json_path "''${@}")
             ;;
 
-          usage|*)
-            echo "Usage: $0 home-manager|hm|nixos|devenv|kubenix|custom"
+          usage)
+            echo "Usage: $(basename "$0") [tool]"
+            echo "  no-arguments:   fzf-based selection of tool"
+            echo "  tool:           any of $KNOWN|$EXTRA"
             echo "  custom: arg2-*: nix build argument for options.json derivation build"
             echo "  custom: arg1  : path to options.json within the above built derivation"
+            echo "$KNOWN"
             exit 1
+            ;;
+
+          fzf|*)
+            SELECTION="$(echo "$KNOWN" | tr '|' '\n' | fzf --no-sort)"
+            if [ -n "$SELECTION" ]; then
+              $0 "$SELECTION"
+            fi
             ;;
         esac
       fi
