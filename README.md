@@ -3,20 +3,20 @@
 The goal of `nix-option-search` is to efficiently search through options
 provided by the nix module system. https://search.nixos.org/options is very
 nice, but works only for nixos options. But there are others like home-manager,
-devenv, kubenix, etc., and probably more to come. nix-option-search is one 
-command line tool to search them all.
+devenv, kubenix, etc., and probably more to come. 
 
-The approach is to build `options.json` and interactively explore them using
-[fzf](https://junegunn.github.io/fzf/). Fzf allows for efficient filtering
-and detailed option previews. Simple, yet effective.
+nix-option-search is one command line tool to search them all. The approach is
+to build `options.json` and interactively explore them using
+[fzf](https://junegunn.github.io/fzf/). Fzf allows for efficient filtering and
+detailed option previews. Simple, yet effective.
 
 The extensibility is a key feature of the nix module system. It is simple to
-(locally) define additional options or even entirely new (convenience) modules.
-Those module options are simply not present in an online system. That is a
-problem `nix-option-search` tries to address. The aim is to extract
-`options.json` from the locally defined setup where all module options are
-available. This avoids version mismatches and you always explore exactly the
-option that are available.
+define additional options by integrating or even writing entirely new
+(convenience) modules. Such locally defined options are simply not present in
+an online system. That is a problem `nix-option-search` tries to address. The
+aim is to extract an `options.json` from the locally defined setup where all
+options are present. This avoids version mismatches and ensures that the search
+always shows exactly the option that are available.
 
 NOTE: The tools is still in an experimental stage. That means, it can be used,
 but things like key-bindings, preview format, and the module-based integration
@@ -25,17 +25,18 @@ are subject to change.
 # Standalone Usage
 
 ```sh
-nix run github:ciderale/nix-option-search [module-system]
+nix run github:ciderale/nix-option-search [module-system-name]
 ```
 
-The currently supported module systems are "nixos", "home-manager", "devenv", or "kubenix".
-If no argument is provided, a prompt allows for selecting the module system using fzf.
+The currently supported module systems are "nixos", "home-manager", "devenv",
+and "kubenix". If no argument is provided, a prompt allows for selecting the
+module system using fzf-based selection.
 
 nix-option-search then allows for interactive exploration of the module
-options. There is an detailed preview for the selected option. Help on
-additional key-bindings is optained by pressing CTRL-?.
+options. There is an detailed preview for the selected option. CTRL-? shows
+a help screen with the currently supported key bindings.
 
-# Module Integration (Experimental, subject to changes)
+# Module Integration (Experimental, subject to change)
 
 This tool directly uses the options of your module configuration. It therefore
 cannot have a version mismatch and also shows your locally defined custom
