@@ -28,7 +28,9 @@
     name ? "nix-option-search",
   }: let
     optionsDoc = nixosOptionsDoc {
-      inherit options;
+      # Ensure that _module.args is not visible
+      options = options // {_module.args.internal = lib.mkForce true;};
+
       warningsAreErrors = false;
       # make it work for home-manager too
       transformOptions = option: let
