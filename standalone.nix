@@ -42,7 +42,7 @@
             OPTIONS_JSON=$(option_json_path "''${@}")
             ;;
 
-          usage)
+          usage|--help|-h)
             echo "Usage: $(basename "$0") [tool]"
             echo "  no-arguments:   fzf-based selection of tool"
             echo "  tool:           any of $KNOWN|$EXTRA"
@@ -53,7 +53,7 @@
             ;;
 
           fzf|*)
-            SELECTION="$(echo "$KNOWN" | tr '|' '\n' | fzf --no-sort)"
+            SELECTION="$(echo "$KNOWN" | tr '|' '\n' | fzf --no-sort --header 'What options would you like to search through?')"
             if [ -n "$SELECTION" ]; then
               exec $0 "$SELECTION"
             fi
