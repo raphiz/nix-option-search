@@ -41,7 +41,7 @@ writeShellApplication {
 
     (echo -e "Version  \tPackage   \tDescription  \tKey"
      nix search "$NIXPKGS_EXPR" --json "''${1:-.}" | jq -r "$LISTING"
-    ) | fzf --sync \
+    ) | fzf --exit-0 --sync \
     --exact --reverse \
     --preview "nix eval --json '$NIXPKGS_EXPR#{4}.meta' --json | jq -r '$DETAIL'" \
     --delimiter '\t' --with-nth ..3 --accept-nth 2 \

@@ -22,7 +22,7 @@ fi
 function search() {
       formatOptions \
             | tr '\n\t' '\0\n' \
-            | fzf --read0 --exact \
+            | fzf --exit-0 --read0 --exact \
             --reverse \
             --no-sort \
             --prompt="Nix Module Options (Press ? for help)> " \
