@@ -82,9 +82,9 @@ elif [ "$1" == "preview" ]; then
       BLUE="\033[34m"
 
       echo -e "${BOLD}Name${RESET}\t\t: $NAME"
-      echo -e "${BOLD}Default${RESET}\t\t:$READONLY $DEFAULT"
       echo -e "${BOLD}Type${RESET}\t\t: $TYPE"
       echo -e "${BOLD}Declaration${RESET}\t: ${BLUE}${DECLARATION}${RESET}"
+      echo -e "${BOLD}Default${RESET}\t\t:$READONLY $DEFAULT"
       echo "──────────────────────────────────────────────────────────────"
       echo -e "${BOLD}Description${RESET}:"
       echo ""
