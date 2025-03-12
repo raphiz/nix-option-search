@@ -76,23 +76,30 @@ elif [ "$1" == "preview" ]; then
       EXAMPLE=$(echo "$RAW" | jq -r '.example.text // empty')
       READONLY=$(echo "$RAW" | jq -r 'if .readOnly then " READONLY" else "" end')
 
-      echo "NAME   : $NAME"
-      echo "DEFAULT:$READONLY $DEFAULT"
-      echo "TYPE   : $TYPE"
-      echo "DECLARATION   : $DECLARATION"
-      echo "--------------------------------------------------------------"
-      echo "DESCRIPTION:"
+      RESET="\033[0m"
+      BOLD="\033[1m"
+      YELLOW="\033[33m"
+      BLUE="\033[34m"
+
+      echo -e "${BOLD}Name${RESET}\t\t: $NAME"
+      echo -e "${BOLD}Default${RESET}\t\t:$READONLY $DEFAULT"
+      echo -e "${BOLD}Type${RESET}\t\t: $TYPE"
+      echo -e "${BOLD}Declaration${RESET}\t: ${BLUE}${DECLARATION}${RESET}"
+      echo "──────────────────────────────────────────────────────────────"
+      echo -e "${BOLD}Description${RESET}:"
       echo ""
       echo "$DESCRIPTION"
       echo ""
       if [ -n "$EXAMPLE" ]; then
-      echo "--------------------------------------------------------------"
-      echo "EXAMPLE:"
+      echo "──────────────────────────────────────────────────────────────"
+      echo -e "${BOLD}Example${RESET}:"
+      echo -e "$YELLOW"
       echo "$EXAMPLE"
+      echo -e "$RESET"
       fi
       if false; then
-            echo "--------------------------------------------------------------"
-            echo "RAW:"
+            echo "──────────────────────────────────────────────────────────────"
+            echo -e "${BOLD}RAW${RESET}:"
             echo ""
             echo "$RAW"
       fi
